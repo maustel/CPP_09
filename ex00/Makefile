@@ -6,7 +6,7 @@
 #    By: maustel <maustel@student.42heilbronn.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/23 16:58:37 by maustel           #+#    #+#              #
-#    Updated: 2025/07/24 18:00:10 by maustel          ###   ########.fr        #
+#    Updated: 2025/07/31 10:50:27 by maustel          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = btc
 CPP = c++
 FLAGS = -Wall -Wextra -Werror -std=c++17
 
-SRC = main.cpp
+SRC = main.cpp BitcoinExchange.cpp
 OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)

@@ -18,21 +18,11 @@
 # include <string>
 # include <fstream>
 # include <stdexcept>
+# include <sstream>
 
 # include "colors.h"
 
-class BitcoinExchange
-{
-	private:
-	std::map<std::string, float> _data;
-
-	public:
-	BitcoinExchange();
-	BitcoinExchange(const BitcoinExchange& other);
-	BitcoinExchange& operator=(BitcoinExchange& other);
-	~BitcoinExchange();
-
-	void parse_dataBase(void);
-};
+void parse_dataBase(std::map<std::string, double>& data_map);
+void extract_input(const std::string& input_file, const std::map<std::string, double>& data_map);
 
 #endif
