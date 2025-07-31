@@ -20,8 +20,6 @@
 # include <stdexcept>
 # include <sstream>
 
-# include "colors.h"
-
 void parse_dataBase(std::map<std::string, double>& data_map);
 void extract_input(const std::string& input_file, const std::map<std::string, double>& data_map);
 
