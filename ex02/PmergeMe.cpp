@@ -76,10 +76,26 @@ void PmergeMe::start(int argc, char **argv)
 	catch (const std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
+	//print vec container content
+	std::cout << "Vector content: ";
+	for (const auto& elem : _vec)
+	{
+		std::cout << elem << " ";
+	}
+	std::cout << std::endl;
+
 	// get precise time in us
 	auto start = std::chrono::high_resolution_clock::now();
 	// ... (sorting logic)
+	auto sortedVec = FordJohnson(_vec, 1);
 	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::micro> duration = end - start;
+	//print sortedVec
+	std::cout << "Sorted vector content: ";
+	for (const auto& elem : sortedVec)
+	{
+		std::cout << elem << " ";
+	}
+	std::cout << std::endl;
 	std::cout << "Sorting took " << duration.count() << " microseconds." << std::endl;
 }
