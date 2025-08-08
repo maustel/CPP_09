@@ -1,0 +1,85 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   PmergeMe.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maustel <maustel@student.42heilbronn.de    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/08 12:23:32 by maustel           #+#    #+#             */
+/*   Updated: 2025/08/08 12:23:32 by maustel          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "PmergeMe.hpp"
+
+PmergeMe::PmergeMe() {}
+
+PmergeMe::PmergeMe(const PmergeMe &other)
+{
+	*this = other;
+}
+
+PmergeMe &PmergeMe::operator=(const PmergeMe &other)
+{
+	if (this != &other) {
+		// Copy any necessary members here
+	}
+	return *this;
+}
+
+PmergeMe::~PmergeMe() {}
+
+void PmergeMe::parseInput(int argc, char **argv)
+{
+	for (int i = 1; i < argc; ++i) {
+		std::string arg = argv[i];
+		if (arg.empty())
+			throw std::invalid_argument("Empty input is not allowed.");
+		size_t start = 0;
+		if (arg[0] == '+')
+			start = 1;
+		if (start >= arg.length())
+			throw std::invalid_argument("Invalid input: sign without digits.");
+		if (arg.find_first_not_of("0123456789", start) != std::string::npos)
+			throw std::invalid_argument("Invalid input: non-digit characters found.");
+
+		int num = std::stoi(arg);
+		if (num < 0)
+			throw std::invalid_argument("Negative numbers are not allowed.");
+		if (std::find(_vec.begin(), _vec.end(), num) != _vec.end())
+			throw std::invalid_argument("Duplicate numbers are not allowed.");
+
+		_vec.push_back(num);
+		_deq.push_back(num);
+	}
+}
+
+void PmergeMe::checkContainers()
+{
+	if (_vec.empty() || _deq.empty())
+		throw std::runtime_error("No valid numbers to sort.");
+	if (_vec.size() != _deq.size())
+		throw std::runtime_error("Vectors and deques must have the same size.");
+	if (_vec.size() == 1 && _deq.size() == 1)
+		throw std::runtime_error("Only one number provided, nothing to sort.");
+	if (std::is_sorted(_vec.begin(), _vec.end()) && std::is_sorted(_deq.begin(), _deq.end()))
+		throw std::runtime_error("The input is already sorted.");
+}
+
+void PmergeMe::start(int argc, char **argv)
+{
+	try
+	{
+		parseInput(argc, argv);
+		checkContainers();
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
+	// get precise time in us
+	auto start = std::chrono::high_resolution_clock::now();
+	// ... (sorting logic)
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::micro> duration = end - start;
+	std::cout << "Sorting took " << duration.count() << " microseconds." << std::endl;
+}
