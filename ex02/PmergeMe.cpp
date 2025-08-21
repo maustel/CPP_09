@@ -12,7 +12,9 @@
 
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe() {}
+PmergeMe::PmergeMe():_jacobsthal(0),
+					_pendIndex(0),
+					_toSearch(0) {}
 
 PmergeMe::PmergeMe(const PmergeMe &other)
 {
@@ -21,14 +23,24 @@ PmergeMe::PmergeMe(const PmergeMe &other)
 
 PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 {
-	if (this != &other) {
+	if (this != &other)
+	{
 		// Copy any necessary members here
+		_vec = other._vec;
+		_deq = other._deq;
+		_jacobsthal = other._jacobsthal;
+		_pendIndex = other._pendIndex;
+		_toSearch = other._toSearch;
 	}
 	return *this;
 }
 
 PmergeMe::~PmergeMe() {}
 
+/*
+check if input is valid and throw errors if not.
+Then write input numbers into containers.
+*/
 void PmergeMe::parseInput(int argc, char **argv)
 {
 	for (int i = 1; i < argc; ++i) {
@@ -54,6 +66,9 @@ void PmergeMe::parseInput(int argc, char **argv)
 	}
 }
 
+/*
+check if containers are valid and throw errors if not.
+*/
 void PmergeMe::checkContainers()
 {
 	if (_vec.empty() || _deq.empty())
@@ -98,4 +113,11 @@ void PmergeMe::start(int argc, char **argv)
 	}
 	std::cout << std::endl;
 	std::cout << "Sorting took " << duration.count() << " microseconds." << std::endl;
+}
+
+void PmergeMe::findJacobsthalNumber(int& previous, int& current)
+{
+	this->_jacobsthal = current + 2 * previous;
+	previous = current;
+	current = this->_jacobsthal;
 }
