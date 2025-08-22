@@ -17,6 +17,7 @@ PmergeMe::PmergeMe():_jacobsthal(3),
 					_pendIndex(0),
 					_toCompare(0),
 					_nbrInsertedElements(0),
+					_currentRangeInserted(0),
 					_searchRange(0) {}
 
 PmergeMe::PmergeMe(const PmergeMe &other)
@@ -35,6 +36,7 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 		_pendIndex = other._pendIndex;
 		_toCompare = other._toCompare;
 		_nbrInsertedElements = other._nbrInsertedElements;
+		_currentRangeInserted = other._currentRangeInserted;
 		_searchRange = other._searchRange;
 	}
 	return *this;
