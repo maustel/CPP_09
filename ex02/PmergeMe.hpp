@@ -31,8 +31,11 @@ class PmergeMe
 		std::vector<int> _vec;
 		std::deque<int> _deq;
 		int _jacobsthal;
+		int _prevJacobsthal;
 		int _pendIndex;
-		int _toSearch;
+		int _toCompare;
+		int _nbrInsertedElements;
+		int _searchRange;
 
 	public:
 		PmergeMe();
@@ -43,7 +46,7 @@ class PmergeMe
 		void start(int argc, char **argv);
 		void parseInput(int argc, char **argv);
 		void checkContainers();
-		void findJacobsthalNumber(int& previous, int& current);
+		void findJacobsthalNumber();
 
 
 /*
@@ -54,11 +57,9 @@ class PmergeMe
 	pendIndex is the index of the first number of the current element
 */
 template <typename T>
-typename T::iterator getStart(int elementSize, T& pend)
+typename T::iterator getPendIndex(int elementSize, T& pend)
 {
 	typename T::iterator it;
-	//print pend.size()/elementSize in YEL
-	std::cout << YEL << "Pend size / Element size: " << (pend.size() / elementSize) << RESET << std::endl;
 	if (static_cast<size_t>(_jacobsthal - 1) > (pend.size() / elementSize))
 	{
 		it = pend.end();
@@ -71,24 +72,85 @@ typename T::iterator getStart(int elementSize, T& pend)
 		std::advance(it, (_jacobsthal - 2) * elementSize);
 		_pendIndex = _jacobsthal - 1;
 	}
-	_toSearch = *(it + elementSize - 1);
+	_toCompare = *(it + elementSize - 1);
 	return (it);
+}
+
+template <typename T>
+void getSearchRange(typename T::iterator& endRange, T& main, int elementSize)
+{
+	if (_searchRange * elementSize > static_cast<int>(main.size()))
+		endRange = std::prev(main.end());
+	else
+		std::advance(endRange, _searchRange * elementSize);
 }
 
 /*
 	Perform binary search and insert into main
 */
 template <typename T>
-void binarySearch(typename T::iterator start, T& main, int elementSize)
+void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 {
-	//search for the startvalue where to insert in main left from pendIndex*elementSize and do binary insertion in that part of the container
-	typename T::iterator it = main.begin();
-	std::advance(it, _pendIndex * elementSize);
-	if (*start < *it)
-		_pendIndex--;
-	else
-	//insert
-		main.insert(it, *start);
+	typename T::iterator startRange = main.begin();
+	typename T::iterator endRange = main.begin();
+
+	getSearchRange(endRange, main, elementSize);
+
+	//print in YEL the part of main from startRange to endRange
+	std::cout << YEL << "Main (before binary search): ";
+	for (auto it = startRange; it != endRange; ++it)
+		std::cout << *it << " ";
+	std::cout << RESET << std::endl;
+
+	// Binary search by comparing with last element of each block
+	typename T::iterator left = startRange;
+	typename T::iterator right = endRange;
+	typename T::iterator insertPos = endRange;
+
+	while (left < right) {
+		// Find the middle block
+		int blocksFromStart = std::distance(startRange, left) / elementSize;
+		int blocksFromEnd = std::distance(startRange, right) / elementSize;
+		int middleBlock = (blocksFromStart + blocksFromEnd) / 2;
+
+		typename T::iterator mid = startRange;
+		std::advance(mid, middleBlock * elementSize);
+
+		// Compare _toCompare with the last element of the middle block
+		if (mid + elementSize - 1 < main.end() && *(mid + elementSize - 1) >= _toCompare)
+		{
+			insertPos = mid;
+			right = mid;
+		}
+		else
+		{
+			left = mid;
+			std::advance(left, elementSize);
+		}
+	}
+
+	// Check if insertion is at the very right of the search range
+	if (insertPos == endRange)
+		_searchRange--;
+
+	// Insert the entire block from PendIterator (elementSize elements) at insertPos
+	main.insert(insertPos, PendIterator, PendIterator + elementSize);
+
+	// Increment the number of inserted elements
+	_nbrInsertedElements++;
+
+	std::cout << GRN << "Inserted block: ";
+	for (auto it = PendIterator; it != PendIterator + elementSize; ++it)
+		std::cout << *it << " ";
+	std::cout << RESET << std::endl;
+
+	std::cout << BLU << "Number of inserted elements: " << _nbrInsertedElements << RESET << std::endl;
+
+	// Print the entire main chain (after insertion)
+	std::cout << YEL << "Main (after binary search): ";
+	for (const auto& elem : main)
+		std::cout << elem << " ";
+	std::cout << RESET << std::endl;
 }
 
 /*
@@ -102,20 +164,25 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 {
 	T& main = chains.first;
 	T& pend = chains.second;
-	int current = 1;
-	int previous = 1;
+	_jacobsthal = 3;
+	_prevJacobsthal = 1;
+	_pendIndex = 0;
+	_toCompare = 0;
+	_nbrInsertedElements = 0;
 
-	size_t totalElements = main.size() + pend.size();
-	// Check if pending chain is empty
+	// size_t totalElements = main.size() + pend.size();
 	if (pend.empty())
 		return;
-	//maybe jacobsthal as local variable (?)
-	findJacobsthalNumber(current, previous);
-	typename T::iterator start = getStart(elementSize, pend);
+
+	// findJacobsthalNumber();
+	typename T::iterator PendIterator = getPendIndex(elementSize, pend);
+	_searchRange = _jacobsthal + _nbrInsertedElements;
 
 	std::cout << MAG << "Jacobsthal: " << _jacobsthal << RESET << std::endl;
-	std::cout << RED << "Start iterator: " << *start << RESET << std::endl;
-	std::cout << RED << "To search: " << _toSearch << RESET << std::endl;
+	std::cout << RED << "Pend iterator: " << *PendIterator << RESET << std::endl;
+	std::cout << RED << "To search: " << _toCompare << RESET << std::endl;
+
+	binarySearch(PendIterator, main, elementSize);
 
 	// while (main.size() != totalElements)
 	// {
@@ -126,7 +193,7 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 	//update container
 	(void)container; // suppress unused variable warning
 	(void)main; // suppress unused variable warning
-	(void)totalElements;
+	// (void)totalElements;
 }
 
 /*

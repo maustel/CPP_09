@@ -12,9 +12,12 @@
 
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe():_jacobsthal(0),
+PmergeMe::PmergeMe():_jacobsthal(3),
+					_prevJacobsthal(1),
 					_pendIndex(0),
-					_toSearch(0) {}
+					_toCompare(0),
+					_nbrInsertedElements(0),
+					_searchRange(0) {}
 
 PmergeMe::PmergeMe(const PmergeMe &other)
 {
@@ -30,7 +33,9 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 		_deq = other._deq;
 		_jacobsthal = other._jacobsthal;
 		_pendIndex = other._pendIndex;
-		_toSearch = other._toSearch;
+		_toCompare = other._toCompare;
+		_nbrInsertedElements = other._nbrInsertedElements;
+		_searchRange = other._searchRange;
 	}
 	return *this;
 }
@@ -115,9 +120,9 @@ void PmergeMe::start(int argc, char **argv)
 	std::cout << "Sorting took " << duration.count() << " microseconds." << std::endl;
 }
 
-void PmergeMe::findJacobsthalNumber(int& previous, int& current)
+void PmergeMe::findJacobsthalNumber()
 {
-	this->_jacobsthal = current + 2 * previous;
-	previous = current;
-	current = this->_jacobsthal;
+	int current = this->_jacobsthal;
+	this->_jacobsthal = current + 2 * _prevJacobsthal;
+	_prevJacobsthal = current;
 }
