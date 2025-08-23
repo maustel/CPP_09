@@ -18,7 +18,8 @@ PmergeMe::PmergeMe():_jacobsthal(3),
 					_toCompare(0),
 					_nbrInsertedElements(0),
 					_currentRangeInserted(0),
-					_searchRange(0) {}
+					_searchRange(0),
+					_nbrComparisons(0) {}
 
 PmergeMe::PmergeMe(const PmergeMe &other)
 {
@@ -38,6 +39,7 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 		_nbrInsertedElements = other._nbrInsertedElements;
 		_currentRangeInserted = other._currentRangeInserted;
 		_searchRange = other._searchRange;
+		_nbrComparisons = other._nbrComparisons;
 	}
 	return *this;
 }
@@ -128,6 +130,9 @@ void PmergeMe::start(int argc, char **argv)
 		std::cout << GRN << "Vector is sorted correctly." << RESET << std::endl;
 	else
 		std::cout << RED << "Vector is NOT sorted correctly." << RESET << std::endl;
+	std::cout << CYN << "Total comparisons made for vector: " << _nbrComparisons << RESET << std::endl;
+
+	_nbrComparisons = 0;
 
 	auto startDeq = std::chrono::high_resolution_clock::now();
 	auto sortedDeq = FordJohnson(_deq, 1);
@@ -139,6 +144,7 @@ void PmergeMe::start(int argc, char **argv)
 		std::cout << GRN << "Deque is sorted correctly." << RESET << std::endl;
 	else
 		std::cout << RED << "Deque is NOT sorted correctly." << RESET << std::endl;
+	std::cout << CYN << "Total comparisons made for deque: " << _nbrComparisons << RESET << std::endl;
 }
 
 void PmergeMe::findJacobsthalNumber()

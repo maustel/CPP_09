@@ -37,6 +37,7 @@ class PmergeMe
 		int _nbrInsertedElements;  // Total number of inserted elements
 		int _currentRangeInserted; // Number of inserted elements in current Jacobsthal range
 		int _searchRange;
+		int _nbrComparisons;       // Count of comparisons made during sorting
 
 	public:
 		PmergeMe();
@@ -129,6 +130,7 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 		std::advance(mid, middleBlock * elementSize);
 
 		// Compare _toCompare with the last element of the middle block
+		_nbrComparisons++; // Count this comparison
 		if (mid + elementSize - 1 < main.end() && *(mid + elementSize - 1) >= _toCompare)
 		{
 			insertPos = mid;
@@ -220,7 +222,6 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 		main.insert(main.end(), restStart, container.end());
 	}
 
-	// Update container with the sorted main chain
 	container = main;
 }
 
@@ -292,6 +293,7 @@ T FordJohnson(T& container, int elementSize)
 		auto itB = i;
 		auto itA = i + elementSize;
 
+		_nbrComparisons++; // Count this comparison
 		if (*(itB + elementSize - 1) > *(itA + elementSize - 1))
 			std::swap_ranges(itA, itA + elementSize, itB);
 	}
