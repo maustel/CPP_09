@@ -35,10 +35,10 @@ class PmergeMe
 		int _prevJacobsthal;
 		int _pendIndex;
 		int _toCompare;
-		int _nbrInsertedElements;  // Total number of inserted elements
-		int _currentRangeInserted; // Number of inserted elements in current Jacobsthal range
+		int _nbrInsertedElements;
+		int _currentRangeInserted;
 		int _searchRange;
-		int _nbrComparisons;       // Count of comparisons made during sorting
+		int _nbrComparisons;
 
 	public:
 		PmergeMe();
@@ -50,7 +50,6 @@ class PmergeMe
 		void parseInput(int argc, char **argv);
 		void checkContainers();
 		void findJacobsthalNumber();
-
 
 /*
 	Find the starting iterator for the binary search.
@@ -76,14 +75,12 @@ typename T::iterator getPendIndex(int elementSize, T& pend)
 		_pendIndex = _jacobsthal - 1;
 	}
 
-	// Skip processed elements (marked as -1)
 	while (it < pend.end() && *it == -1)
 	{
 		std::advance(it, elementSize);
 		_pendIndex++;
 		if (it >= pend.end())
 		{
-			// Wrap around or find next valid Jacobsthal position
 			it = pend.end();
 			std::advance(it, -elementSize);
 			_pendIndex = (pend.size()) / elementSize;
@@ -109,29 +106,26 @@ void getSearchRange(typename T::iterator& endRange, T& main, int elementSize)
 	Perform binary search and insert into main
 */
 template <typename T>
-void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
+void binaryInsertion(typename T::iterator PendIterator, T& main, int elementSize)
 {
 	typename T::iterator startRange = main.begin();
 	typename T::iterator endRange = main.begin();
 
 	getSearchRange(endRange, main, elementSize);
 
-	// Binary search by comparing with last element of each block
 	typename T::iterator left = startRange;
 	typename T::iterator right = endRange;
 	typename T::iterator insertPos = endRange;
 
 	while (left < right)
 	{
-		// Find the middle block
-		int blocksFromStart = std::distance(startRange, left) / elementSize;
-		int blocksFromEnd = std::distance(startRange, right) / elementSize;
-		int middleBlock = (blocksFromStart + blocksFromEnd) / 2;
+		int elementsFromStart = std::distance(startRange, left) / elementSize;
+		int elementsFromEnd = std::distance(startRange, right) / elementSize;
+		int middleElement = (elementsFromStart + elementsFromEnd) / 2;
 
 		typename T::iterator mid = startRange;
-		std::advance(mid, middleBlock * elementSize);
+		std::advance(mid, middleElement * elementSize);
 
-		// Compare _toCompare with the last element of the middle block
 		_nbrComparisons++;
 		if (mid + elementSize - 1 < main.end() && *(mid + elementSize - 1) >= _toCompare)
 		{
@@ -142,32 +136,25 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 		{
 			left = mid;
 			std::advance(left, elementSize);
-			insertPos = left;  // Update insertPos to the new left position
+			insertPos = left;
 		}
 	}
+	main.insert(insertPos, PendIterator, PendIterator + elementSize);
 
-	// Check if insertion is at the very right of the search range
 	if (insertPos == endRange)
 		_searchRange--;
 
-	// Insert the entire block from PendIterator (elementSize elements) at insertPos
-	main.insert(insertPos, PendIterator, PendIterator + elementSize);
-
-	// Mark the inserted elements as processed in the pending chain
 	std::fill(PendIterator, PendIterator + elementSize, -1);
-
-	_nbrInsertedElements++;        // Total insertions
-	_currentRangeInserted++;       // Current Jacobsthal range insertions
+	_nbrInsertedElements++;
+	_currentRangeInserted++;
 }
 
 /*
-Binary insertion sort: sort from chain into main
-Use jacobsthal numbers to find out which position gets sorted in first.
-Start binary search in main at position left from corresponding pair number.
-Same as before: compare always last number of elementSize-block
+	Main sorting loop using Jacobsthal numbers and binary insertion:
+
 */
 template <typename T>
-void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
+void SortingMainLoop(T& container, int elementSize, std::pair<T,T>& chains)
 {
 	T& main = chains.first;
 	T& pend = chains.second;
@@ -175,8 +162,8 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 	_prevJacobsthal = 1;
 	_pendIndex = 0;
 	_toCompare = 0;
-	_nbrInsertedElements = 0;     // Total inserted elements
-	_currentRangeInserted = 0;    // Elements inserted in current Jacobsthal range
+	_nbrInsertedElements = 0;
+	_currentRangeInserted = 0;
 
 	if (pend.empty())
 		return;
@@ -184,13 +171,11 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 	typename T::iterator PendIterator = getPendIndex(elementSize, pend);
 	_searchRange = _jacobsthal + _nbrInsertedElements;
 
-	binarySearch(PendIterator, main, elementSize);
+	binaryInsertion(PendIterator, main, elementSize);
 
-	// Ford-Johnson algorithm main loop - continue until all non-(-1) elements are processed
 	while (std::find_if(pend.begin(), pend.end(), [](int x) { return x != -1; }) != pend.end() &&
 			_nbrInsertedElements < static_cast<int>(pend.size() / elementSize))
 	{
-		// Check if we've inserted all elements for current Jacobsthal range
 		if (_currentRangeInserted == _jacobsthal - _prevJacobsthal)
 		{
 			findJacobsthalNumber();
@@ -213,10 +198,9 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 				_searchRange = _jacobsthal + _nbrInsertedElements;
 			}
 		}
-		binarySearch(PendIterator, main, elementSize);
+		binaryInsertion(PendIterator, main, elementSize);
 	}
 
-	// Insert remaining elements from the end of container into main
 	size_t processedElements = main.size();
 	if (processedElements < container.size())
 	{
@@ -241,7 +225,6 @@ std::pair<T,T> buildChains(T& container, int elementSize)
 	T pendingChain;
 
 	auto it = container.begin();
-	//push the first elementSize numbers into mainChain
 	for (int i = 0; i < elementSize && it != container.end(); ++i, ++it)
 		mainChain.push_back(*it);
 	int insert = 1;
@@ -256,26 +239,6 @@ std::pair<T,T> buildChains(T& container, int elementSize)
 		if (distance(container.begin(), it) % elementSize == 0)
 			++insert;
 	}
-	// if (elementSize == 1)
-	// {
-	// 	std::cout << BLU << "elementSize: " << elementSize << RESET << std::endl;
-
-	// 	std::cout << GRN << "Container: ";
-	// 	for (const auto& elem : container)
-	// 		std::cout << elem << " ";
-	// 	std::cout << RESET << std::endl;
-
-	// 	//print main chain and pending chain
-	// 	std::cout << "Main chain: ";
-	// 	for (const auto& elem : mainChain)
-	// 		std::cout << elem << " ";
-	// 	std::cout << "\nPending chain: ";
-	// 	for (const auto& elem : pendingChain)
-	// 		std::cout << elem << " ";
-	// 	std::cout << std::endl;
-	// }
-
-
 	return std::make_pair(mainChain, pendingChain);
 }
 
@@ -298,7 +261,7 @@ T FordJohnson(T& container, int elementSize)
 		auto itB = i;
 		auto itA = i + elementSize;
 
-		_nbrComparisons++; // Count this comparison
+		_nbrComparisons++;
 		if (*(itB + elementSize - 1) > *(itA + elementSize - 1))
 			std::swap_ranges(itA, itA + elementSize, itB);
 	}
@@ -306,7 +269,7 @@ T FordJohnson(T& container, int elementSize)
 	{
 		FordJohnson(container, elementSize * 2);
 		std::pair<T,T> chains = buildChains(container, elementSize);
-		binaryInsertion(container, elementSize, chains);
+		SortingMainLoop(container, elementSize, chains);
 	}
 	return (container);
 }

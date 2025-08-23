@@ -62,7 +62,7 @@ void PmergeMe::parseInput(int argc, char **argv)
 		if (start >= arg.length())
 			throw std::invalid_argument("Invalid input: sign without digits.");
 		if (arg.find_first_not_of("0123456789", start) != std::string::npos)
-			throw std::invalid_argument("Invalid input: non-digit characters found.");
+			throw std::invalid_argument("Invalid input: non-digit characters found in " + arg + " at position " + std::to_string(i));
 
 		int num = std::stoi(arg);
 		if (num < 0)

@@ -6,9 +6,14 @@
 /*   By: maustel <maustel@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 15:47:39 by maustel           #+#    #+#             */
-/*   Updated: 2025/08/08 13:01:32 by maustel          ###   ########.fr       */
+/*   Updated: 2025/08/23 14:42:52 by maustel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+/*
+random number generator:
+https://stattrek.com/statistics/random-number-generator
+*/
 
 #include "PmergeMe.hpp"
 
