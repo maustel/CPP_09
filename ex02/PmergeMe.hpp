@@ -22,6 +22,7 @@
 #include <ctime>
 #include <sstream>
 #include <chrono>
+#include <cmath>
 
 #include "colors.h"
 
@@ -120,7 +121,8 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 	typename T::iterator right = endRange;
 	typename T::iterator insertPos = endRange;
 
-	while (left < right) {
+	while (left < right)
+	{
 		// Find the middle block
 		int blocksFromStart = std::distance(startRange, left) / elementSize;
 		int blocksFromEnd = std::distance(startRange, right) / elementSize;
@@ -130,7 +132,7 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 		std::advance(mid, middleBlock * elementSize);
 
 		// Compare _toCompare with the last element of the middle block
-		_nbrComparisons++; // Count this comparison
+		_nbrComparisons++;
 		if (mid + elementSize - 1 < main.end() && *(mid + elementSize - 1) >= _toCompare)
 		{
 			insertPos = mid;
@@ -140,6 +142,7 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 		{
 			left = mid;
 			std::advance(left, elementSize);
+			insertPos = left;  // Update insertPos to the new left position
 		}
 	}
 
@@ -210,7 +213,6 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 				_searchRange = _jacobsthal + _nbrInsertedElements;
 			}
 		}
-
 		binarySearch(PendIterator, main, elementSize);
 	}
 
@@ -254,22 +256,25 @@ std::pair<T,T> buildChains(T& container, int elementSize)
 		if (distance(container.begin(), it) % elementSize == 0)
 			++insert;
 	}
-	// //print container in green
-	// std::cout << GRN << "Container: ";
-	// for (const auto& elem : container)
-	// 	std::cout << elem << " ";
-	// std::cout << RESET << std::endl;
+	// if (elementSize == 1)
+	// {
+	// 	std::cout << BLU << "elementSize: " << elementSize << RESET << std::endl;
 
-	// std::cout << BLU << "elementSize: " << elementSize << RESET << std::endl;
+	// 	std::cout << GRN << "Container: ";
+	// 	for (const auto& elem : container)
+	// 		std::cout << elem << " ";
+	// 	std::cout << RESET << std::endl;
 
-	// //print main chain and pending chain
-	// std::cout << "Main chain: ";
-	// for (const auto& elem : mainChain)
-	// 	std::cout << elem << " ";
-	// std::cout << "\nPending chain: ";
-	// for (const auto& elem : pendingChain)
-	// 	std::cout << elem << " ";
-	// std::cout << std::endl;
+	// 	//print main chain and pending chain
+	// 	std::cout << "Main chain: ";
+	// 	for (const auto& elem : mainChain)
+	// 		std::cout << elem << " ";
+	// 	std::cout << "\nPending chain: ";
+	// 	for (const auto& elem : pendingChain)
+	// 		std::cout << elem << " ";
+	// 	std::cout << std::endl;
+	// }
+
 
 	return std::make_pair(mainChain, pendingChain);
 }

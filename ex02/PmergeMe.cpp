@@ -91,6 +91,20 @@ void PmergeMe::checkContainers()
 }
 
 /*
+Maximal number of comparisons allowed for a given input size.
+*/
+int MaxComparisonsAllowed(int nbrElements)
+{
+	int sum = 0;
+	for (int k = 1; k <= nbrElements; ++k)
+	{
+		double value = (3.0 / 4.0) * k;
+		sum += static_cast<int>(ceil(log2(value)));
+	}
+	return sum;
+}
+
+/*
 Start the sorting process.
 
 vector is much faster, because it is more efficient with memory access
@@ -107,7 +121,8 @@ void PmergeMe::start(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << "Error: " << e.what() << std::endl;
+		std::cerr << RED << "Error: " << e.what() << RESET << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	std::cout << "unsorted: ";
@@ -122,8 +137,8 @@ void PmergeMe::start(int argc, char **argv)
 
 	std::cout << "Sorted: ";
 	for (const auto& elem : sortedVec)
-		std::cout << elem << " ";
-	std::cout << std::endl;
+		std::cout << YEL << elem << " ";
+	std::cout << RESET << std::endl;
 
 	std::cout << "Time to process a range of " << _vec.size() << " elements with std::vector: " << duration.count() << " microseconds." << std::endl;
 	if (is_sorted(sortedVec.begin(), sortedVec.end()))
@@ -145,6 +160,8 @@ void PmergeMe::start(int argc, char **argv)
 	else
 		std::cout << RED << "Deque is NOT sorted correctly." << RESET << std::endl;
 	std::cout << CYN << "Total comparisons made for deque: " << _nbrComparisons << RESET << std::endl;
+	int maxAllowed = MaxComparisonsAllowed(_vec.size());
+	std::cout << MAG << "Max comparisons allowed: " << maxAllowed << RESET << std::endl;
 }
 
 void PmergeMe::findJacobsthalNumber()
