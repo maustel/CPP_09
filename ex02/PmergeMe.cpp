@@ -30,7 +30,6 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 {
 	if (this != &other)
 	{
-		// Copy any necessary members here
 		_vec = other._vec;
 		_deq = other._deq;
 		_jacobsthal = other._jacobsthal;
@@ -47,8 +46,8 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 PmergeMe::~PmergeMe() {}
 
 /*
-check if input is valid and throw errors if not.
-Then write input numbers into containers.
+	check if input is valid and throw errors if not.
+	Then write input numbers into containers.
 */
 void PmergeMe::parseInput(int argc, char **argv)
 {
@@ -76,7 +75,7 @@ void PmergeMe::parseInput(int argc, char **argv)
 }
 
 /*
-check if containers are valid and throw errors if not.
+	check if containers are valid and throw errors if not.
 */
 void PmergeMe::checkContainers()
 {
@@ -91,7 +90,8 @@ void PmergeMe::checkContainers()
 }
 
 /*
-Maximal number of comparisons allowed for a given input size.
+	Maximal number of comparisons allowed for a given input size.
+	For checking performance and optimization.
 */
 int MaxComparisonsAllowed(int nbrElements)
 {
@@ -105,12 +105,12 @@ int MaxComparisonsAllowed(int nbrElements)
 }
 
 /*
-Start the sorting process.
+	Start the sorting process.
 
-vector is much faster, because it is more efficient with memory access
-patterns like iterator arithmetic and random access.
-deque uses a more complex memory structure, which can lead to slower
-access times in certain scenarios.
+	vector is much faster, because it is more efficient with memory access
+	patterns like iterator arithmetic and random access.
+	deque uses a more complex memory structure, which can lead to slower
+	access times in certain scenarios.
 */
 void PmergeMe::start(int argc, char **argv)
 {
@@ -141,11 +141,11 @@ void PmergeMe::start(int argc, char **argv)
 	std::cout << RESET << std::endl;
 
 	std::cout << "Time to process a range of " << _vec.size() << " elements with std::vector: " << duration.count() << " microseconds." << std::endl;
-	if (is_sorted(sortedVec.begin(), sortedVec.end()))
-		std::cout << GRN << "Vector is sorted correctly." << RESET << std::endl;
-	else
-		std::cout << RED << "Vector is NOT sorted correctly." << RESET << std::endl;
-	std::cout << CYN << "Total comparisons made for vector: " << _nbrComparisons << RESET << std::endl;
+	// if (is_sorted(sortedVec.begin(), sortedVec.end()))
+	// 	std::cout << GRN << "Vector is sorted correctly." << RESET << std::endl;
+	// else
+	// 	std::cout << RED << "Vector is NOT sorted correctly." << RESET << std::endl;
+	// std::cout << CYN << "Total comparisons made for vector: " << _nbrComparisons << RESET << std::endl;
 
 	_nbrComparisons = 0;
 
@@ -155,13 +155,13 @@ void PmergeMe::start(int argc, char **argv)
 	std::chrono::duration<double, std::micro> durationDeq = endDeq - startDeq;
 
 	std::cout << "Time to process a range of " << _deq.size() << " elements with std::deque: " << durationDeq.count() << " microseconds." << std::endl;
-	if (is_sorted(sortedDeq.begin(), sortedDeq.end()))
-		std::cout << GRN << "Deque is sorted correctly." << RESET << std::endl;
-	else
-		std::cout << RED << "Deque is NOT sorted correctly." << RESET << std::endl;
-	std::cout << CYN << "Total comparisons made for deque: " << _nbrComparisons << RESET << std::endl;
-	int maxAllowed = MaxComparisonsAllowed(_vec.size());
-	std::cout << MAG << "Max comparisons allowed: " << maxAllowed << RESET << std::endl;
+	// if (is_sorted(sortedDeq.begin(), sortedDeq.end()))
+	// 	std::cout << GRN << "Deque is sorted correctly." << RESET << std::endl;
+	// else
+	// 	std::cout << RED << "Deque is NOT sorted correctly." << RESET << std::endl;
+	// std::cout << CYN << "Total comparisons made for deque: " << _nbrComparisons << RESET << std::endl;
+	// int maxAllowed = MaxComparisonsAllowed(_vec.size());
+	// std::cout << MAG << "Max comparisons allowed: " << maxAllowed << RESET << std::endl;
 }
 
 void PmergeMe::findJacobsthalNumber()
