@@ -114,12 +114,6 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 
 	getSearchRange(endRange, main, elementSize);
 
-	//print in YEL the part of main from startRange to endRange
-	std::cout << YEL << "Main (before binary search): ";
-	for (auto it = startRange; it != endRange; ++it)
-		std::cout << *it << " ";
-	std::cout << RESET << std::endl;
-
 	// Binary search by comparing with last element of each block
 	typename T::iterator left = startRange;
 	typename T::iterator right = endRange;
@@ -157,22 +151,8 @@ void binarySearch(typename T::iterator PendIterator, T& main, int elementSize)
 	// Mark the inserted elements as processed in the pending chain
 	std::fill(PendIterator, PendIterator + elementSize, -1);
 
-	// Increment both counters
 	_nbrInsertedElements++;        // Total insertions
 	_currentRangeInserted++;       // Current Jacobsthal range insertions
-
-	std::cout << GRN << "Inserted block: ";
-	for (auto it = PendIterator; it != PendIterator + elementSize; ++it)
-		std::cout << *it << " ";
-	std::cout << RESET << std::endl;
-
-	std::cout << BLU << "Number of inserted elements: " << _nbrInsertedElements << RESET << std::endl;
-
-	// Print the entire main chain (after insertion)
-	std::cout << YEL << "Main (after binary search): ";
-	for (const auto& elem : main)
-		std::cout << elem << " ";
-	std::cout << RESET << std::endl;
 }
 
 /*
@@ -193,75 +173,55 @@ void binaryInsertion(T& container, int elementSize, std::pair<T,T>& chains)
 	_nbrInsertedElements = 0;     // Total inserted elements
 	_currentRangeInserted = 0;    // Elements inserted in current Jacobsthal range
 
-	// size_t totalElements = main.size() + pend.size();
 	if (pend.empty())
 		return;
 
-	// findJacobsthalNumber();
 	typename T::iterator PendIterator = getPendIndex(elementSize, pend);
 	_searchRange = _jacobsthal + _nbrInsertedElements;
-
-	std::cout << MAG << "Jacobsthal: " << _jacobsthal << RESET << std::endl;
-	std::cout << RED << "Pend iterator: " << *PendIterator << RESET << std::endl;
-	std::cout << RED << "To search: " << _toCompare << RESET << std::endl;
 
 	binarySearch(PendIterator, main, elementSize);
 
 	// Ford-Johnson algorithm main loop - continue until all non-(-1) elements are processed
 	while (std::find_if(pend.begin(), pend.end(), [](int x) { return x != -1; }) != pend.end() &&
-	       _nbrInsertedElements < static_cast<int>(pend.size() / elementSize))
+			_nbrInsertedElements < static_cast<int>(pend.size() / elementSize))
 	{
 		// Check if we've inserted all elements for current Jacobsthal range
 		if (_currentRangeInserted == _jacobsthal - _prevJacobsthal)
 		{
-			// Find new Jacobsthal numbers using the implemented function
 			findJacobsthalNumber();
-			// Reset the current range counter for the new range
 			_currentRangeInserted = 0;
-			// Update pendIndex and searchRange for new Jacobsthal
 			PendIterator = getPendIndex(elementSize, pend);
 			_searchRange = _jacobsthal + _nbrInsertedElements;
-
-			std::cout << MAG << "New Jacobsthal: " << _jacobsthal << " (prev: " << _prevJacobsthal << ")" << RESET << std::endl;
-			std::cout << RED << "New Pend iterator: " << *PendIterator << RESET << std::endl;
 		}
 		else
 		{
-			// Step back in pendIndex by elementSize
 			_pendIndex--;
 			if (_pendIndex > 0 && PendIterator >= pend.begin() + elementSize)
 			{
 				PendIterator -= elementSize;
 				_toCompare = *(PendIterator + elementSize - 1);
-				std::cout << YEL << "Stepped back - Pend iterator: " << *PendIterator << " To search: " << _toCompare << RESET << std::endl;
 			}
 			else
 			{
-				// Can't step back further, get new Jacobsthal
 				findJacobsthalNumber();
 				PendIterator = getPendIndex(elementSize, pend);
 				_searchRange = _jacobsthal + _nbrInsertedElements;
 			}
 		}
 
-		// Perform binary search and insertion
 		binarySearch(PendIterator, main, elementSize);
 	}
 
 	// Insert remaining elements from the end of container into main
-	// The remaining elements are those not included in main+pend chains
-	size_t processedElements = main.size() + pend.size();
-	if (processedElements < container.size()) {
+	size_t processedElements = main.size();
+	if (processedElements < container.size())
+	{
 		auto restStart = container.begin() + processedElements;
 		main.insert(main.end(), restStart, container.end());
-		std::cout << CYN << "Inserted " << std::distance(restStart, container.end()) << " remaining elements from container" << RESET << std::endl;
 	}
 
 	// Update container with the sorted main chain
-	container = main;	std::cout << GRN << "Final sorted container: ";
-	for (const auto& elem : container)
-		std::cout << elem << " ";
-	std::cout << RESET << std::endl;
+	container = main;
 }
 
 /*
@@ -293,22 +253,22 @@ std::pair<T,T> buildChains(T& container, int elementSize)
 		if (distance(container.begin(), it) % elementSize == 0)
 			++insert;
 	}
-	//print container in green
-	std::cout << GRN << "Container: ";
-	for (const auto& elem : container)
-		std::cout << elem << " ";
-	std::cout << RESET << std::endl;
+	// //print container in green
+	// std::cout << GRN << "Container: ";
+	// for (const auto& elem : container)
+	// 	std::cout << elem << " ";
+	// std::cout << RESET << std::endl;
 
-	std::cout << BLU << "elementSize: " << elementSize << RESET << std::endl;
+	// std::cout << BLU << "elementSize: " << elementSize << RESET << std::endl;
 
-	//print main chain and pending chain
-	std::cout << "Main chain: ";
-	for (const auto& elem : mainChain)
-		std::cout << elem << " ";
-	std::cout << "\nPending chain: ";
-	for (const auto& elem : pendingChain)
-		std::cout << elem << " ";
-	std::cout << std::endl;
+	// //print main chain and pending chain
+	// std::cout << "Main chain: ";
+	// for (const auto& elem : mainChain)
+	// 	std::cout << elem << " ";
+	// std::cout << "\nPending chain: ";
+	// for (const auto& elem : pendingChain)
+	// 	std::cout << elem << " ";
+	// std::cout << std::endl;
 
 	return std::make_pair(mainChain, pendingChain);
 }

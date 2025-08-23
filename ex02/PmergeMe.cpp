@@ -88,6 +88,14 @@ void PmergeMe::checkContainers()
 		throw std::runtime_error("The input is already sorted.");
 }
 
+/*
+Start the sorting process.
+
+vector is much faster, because it is more efficient with memory access
+patterns like iterator arithmetic and random access.
+deque uses a more complex memory structure, which can lead to slower
+access times in certain scenarios.
+*/
 void PmergeMe::start(int argc, char **argv)
 {
 	try
@@ -95,31 +103,42 @@ void PmergeMe::start(int argc, char **argv)
 		parseInput(argc, argv);
 		checkContainers();
 	}
-	catch (const std::exception &e) {
+	catch (const std::exception &e)
+	{
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
-	//print vec container content
-	std::cout << "Vector content: ";
+
+	std::cout << "unsorted: ";
 	for (const auto& elem : _vec)
-	{
 		std::cout << elem << " ";
-	}
 	std::cout << std::endl;
 
-	// get precise time in us
 	auto start = std::chrono::high_resolution_clock::now();
-	// ... (sorting logic)
 	auto sortedVec = FordJohnson(_vec, 1);
 	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::micro> duration = end - start;
-	//print sortedVec
-	std::cout << "Sorted vector content: ";
+
+	std::cout << "Sorted: ";
 	for (const auto& elem : sortedVec)
-	{
 		std::cout << elem << " ";
-	}
 	std::cout << std::endl;
-	std::cout << "Sorting took " << duration.count() << " microseconds." << std::endl;
+
+	std::cout << "Time to process a range of " << _vec.size() << " elements with std::vector: " << duration.count() << " microseconds." << std::endl;
+	if (is_sorted(sortedVec.begin(), sortedVec.end()))
+		std::cout << GRN << "Vector is sorted correctly." << RESET << std::endl;
+	else
+		std::cout << RED << "Vector is NOT sorted correctly." << RESET << std::endl;
+
+	auto startDeq = std::chrono::high_resolution_clock::now();
+	auto sortedDeq = FordJohnson(_deq, 1);
+	auto endDeq = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::micro> durationDeq = endDeq - startDeq;
+
+	std::cout << "Time to process a range of " << _deq.size() << " elements with std::deque: " << durationDeq.count() << " microseconds." << std::endl;
+	if (is_sorted(sortedDeq.begin(), sortedDeq.end()))
+		std::cout << GRN << "Deque is sorted correctly." << RESET << std::endl;
+	else
+		std::cout << RED << "Deque is NOT sorted correctly." << RESET << std::endl;
 }
 
 void PmergeMe::findJacobsthalNumber()
