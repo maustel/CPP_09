@@ -55,9 +55,12 @@ Function to validate the value in the database
 ------------------------------------------------------*/
 void convertValidateDatabaseValue(double &value, const std::string& line, std::string value_str)
 {
-	try {
+	try
+	{
 		value = std::stod(value_str);
-	} catch (const std::exception&) {
+	}
+	catch (const std::exception&)
+	{
 		throw std::runtime_error("invalid value in data.csv: " + line);
 	}
 
@@ -71,6 +74,9 @@ void convertValidateDatabaseValue(double &value, const std::string& line, std::s
 
 /*---------------------------------------------------
 store data from data.csv into map
+std::istringstream  a way to break down a string into smaller parts
+std::getline(ss, date, ',') -> Gets everything up to first comma, writes it into date
+std::getline(ss, value_str) -> Gets everything after the comma, writes it into value_str
 ------------------------------------------------------*/
 void parse_dataBase(std::map<std::string, double>& data_map)
 {
@@ -107,9 +113,12 @@ Check and validate the value of the input-data
 ------------------------------------------------------*/
 bool convertCheckInputValue(const std::string& value_str, double& value, const std::string& line)
 {
-	try {
+	try
+	{
 		value = std::stod(value_str);
-	} catch (const std::exception&) {
+	}
+	catch (const std::exception&)
+	{
 		std::cerr << "Error: invalid value in input => " << line << std::endl;
 		return false;
 	}

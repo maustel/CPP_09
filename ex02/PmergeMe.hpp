@@ -134,7 +134,6 @@ class PmergeMe
 	/*
 		Perform binary search and insert element block into main chain:
 
-		Step-by-step process:
 		1. Define search range in main chain (limited by _searchRange for optimization)
 		2. Binary search to find correct insertion position:
 		- Compare _toCompare with the last element of each middle block
